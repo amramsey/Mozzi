@@ -6,7 +6,7 @@
 
 	 Circuit: Audio output on digital pin 9 on a Uno or similar, or
 	 DAC/A14 on Teensy 3.1, or
-	 check the README or http://sensorium.github.com/Mozzi/
+	 check the README or http://sensorium.github.io/Mozzi/
 
 	 Mozzi help/discussion/announcements:
 	 https://groups.google.com/forum/#!forum/mozzi-users
@@ -86,7 +86,7 @@ void updateControl(){
 }
 
 
-int updateAudio(){
+AudioOutput_t updateAudio(){
   int asig;
   switch (whose_turn) {
   case 0:
@@ -108,7 +108,7 @@ int updateAudio(){
     asig = aSin5.next();
     break;
   }
-  return asig;
+  return MonoOutput::from8Bit(asig);
 }
 
 

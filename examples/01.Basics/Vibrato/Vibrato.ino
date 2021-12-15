@@ -5,7 +5,7 @@
 
     Circuit: Audio output on digital pin 9 on a Uno or similar, or
     DAC/A14 on Teensy 3.1, or
-    check the README or http://sensorium.github.com/Mozzi/
+    check the README or http://sensorium.github.io/Mozzi/
 
 		Mozzi documentation/API
 		https://sensorium.github.io/Mozzi/doc/html/index.html
@@ -40,9 +40,9 @@ void updateControl(){
 }
 
 
-int updateAudio(){
+AudioOutput_t updateAudio(){
     Q15n16 vibrato = (Q15n16) intensity * aVibrato.next();
-    return aCos.phMod(vibrato); // phase modulation to modulate frequency
+    return MonoOutput::from8Bit(aCos.phMod(vibrato)); // phase modulation to modulate frequency
 }
 
 void loop(){

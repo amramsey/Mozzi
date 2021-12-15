@@ -10,7 +10,7 @@
  Circuit:
  Audio cable centre wire on pin A0, outer shielding to Arduino Ground.
  Audio output on DAC/A14 on Teensy 3.0, 3.1, or digital pin 9 on a Uno or similar, or
- check the README or http://sensorium.github.com/Mozzi/
+ check the README or http://sensorium.github.io/Mozzi/
 
  		Mozzi help/discussion/announcements:
   https://groups.google.com/forum/#!forum/mozzi-users
@@ -29,12 +29,13 @@ void updateControl(){
 }
 
 
-int updateAudio(){
+AudioOutput_t updateAudio(){
   int asig = getAudioInput(); // range 0-1023
   asig = asig - 512; // now range is -512 to 511
   // output range in STANDARD mode is -244 to 243,
-  // so you might need to adjust your signal to suit
-  return asig;
+  // we scale down only by one bit, so you might need
+  // to adjust your signal to suit
+  return MonoOutput::fromAlmostNBit(9, asig).clip();
 }
 
 

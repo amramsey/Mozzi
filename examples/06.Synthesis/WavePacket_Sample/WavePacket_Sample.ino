@@ -9,7 +9,7 @@
     Circuit:
     	Audio output on DAC/A14 on Teensy 3.0, 3.1,
     	or digital pin 9 on a Uno or similar, or
-    	check the README or http://sensorium.github.com/Mozzi/
+    	check the README or http://sensorium.github.io/Mozzi/
 
     	Potentiometer connected to analog pin 0.
       Center pin of the potentiometer goes to the analog pin.
@@ -66,8 +66,8 @@ void updateControl(){
 }
 
 
-int updateAudio(){
-  return wavey.next()>>8; // >>8 for AUDIO_MODE STANDARD
+AudioOutput_t updateAudio(){
+  return MonoOutput::from16Bit(wavey.next());
 }
 
 

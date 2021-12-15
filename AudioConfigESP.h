@@ -23,12 +23,21 @@
 #error HIFI mode is not available for this CPU architecture (but check ESP_AUDIO_OUT_MODE, and PDM_RESOLUTION)
 #endif
 
-#if (STEREO_HACK == true)
+#if (AUDIO_CHANNELS > 1)
 #if (ESP_AUDIO_OUT_MODE != EXTERNAL_DAC_VIA_I2S)
 #error Stereo is not available for the configured audio output mode
 #endif
 #endif
 
-#define AUDIO_BIAS ((uint16_t) 1<<(15))
+#if (ESP_AUDIO_OUT_MODE != PDM_VIA_SERIAL)
+// NOTE: On ESP / output via I2S, we simply use the I2S buffer as the output
+// buffer, which saves RAM, but also simplifies things a lot
+// esp. since i2s output already has output rate control -> no need for a
+// separate output timer
+#define BYPASS_MOZZI_OUTPUT_BUFFER true
+#endif
+
+#define AUDIO_BITS 16
+#define AUDIO_BIAS ((uint16_t) 1<<(AUDIO_BITS-1))
 
 #endif        //  #ifndef AUDIOCONFIGESP_H

@@ -5,7 +5,7 @@
 
     Circuit: Audio output on digital pin 9 on a Uno or similar, or
     DAC/A14 on Teensy 3.1, or
-    check the README or http://sensorium.github.com/Mozzi/
+    check the README or http://sensorium.github.io/Mozzi/
 
 		Mozzi documentation/API
 		https://sensorium.github.io/Mozzi/doc/html/index.html
@@ -49,10 +49,10 @@ void updateControl(){
 }
 
 
-int updateAudio(){
+AudioOutput_t updateAudio(){
   // watch output levels, they can distort if too high
   // also, at very resonant settings, the input signal may need attenuating
-  return svf.next(aNoise.next())>>3;
+  return MonoOutput::fromAlmostNBit(12, svf.next(aNoise.next()));
 }
 
 

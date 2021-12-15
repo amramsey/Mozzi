@@ -22,7 +22,7 @@
     Resistors are ±0.5%
     Circuit: Audio output on digital pins 9 and 10 on a Uno or similar, or
     DAC/A14 on Teensy 3.1, or
-    check the README or http://sensorium.github.com/Mozzi/
+    check the README or http://sensorium.github.io/Mozzi/
 
 		Mozzi documentation/API
 		https://sensorium.github.io/Mozzi/doc/html/index.html
@@ -97,8 +97,8 @@ void updateControl() {
 }
 
 
-int updateAudio() {
-  return (((long)aSample0.next() * alevel0) + ((long)aSample1.next() * alevel1)) >> 2;
+AudioOutput_t updateAudio() {
+  return MonoOutput::fromNBit(17, ((long)aSample0.next() * alevel0) + ((long)aSample1.next() * alevel1));
 }
 
 

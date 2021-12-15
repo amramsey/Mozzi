@@ -6,7 +6,7 @@
 
     Circuit: Audio output on digital pin 9 on a Uno or similar, or
     DAC/A14 on Teensy 3.1, or
-    check the README or http://sensorium.github.com/Mozzi/
+    check the README or http://sensorium.github.io/Mozzi/
 
 		Mozzi documentation/API
 		https://sensorium.github.io/Mozzi/doc/html/index.html
@@ -36,8 +36,8 @@ AudioDelayFeedback <128> aDel1;
 AudioDelayFeedback <128> aDel2;
 
 // the delay time, measured in samples, updated in updateControl, and used in updateAudio
-unsigned int del_samps1;
-unsigned int del_samps2;
+uint16_t del_samps1;
+uint16_t del_samps2;
 
 
 void setup(){
@@ -62,13 +62,13 @@ void updateControl(){
 }
 
 
-int updateAudio(){
+AudioOutput_t updateAudio(){
   char asig1 = aTriangle1.next(); // get this so it can be used twice without calling next() again
   int aflange1 = (asig1>>3) + aDel1.next(asig1, del_samps1); // mix some straignt signal with the delayed signal
 
   char asig2 = aTriangle2.next(); // get this so it can be used twice without calling next() again
   int aflange2 = (asig2>>3) + aDel2.next(asig2, del_samps2); // mix some straignt signal with the delayed signal
-  return (aflange1 + aflange2)>>1;
+  return MonoOutput::fromAlmostNBit(10, aflange1 + aflange2);
 }
 
 

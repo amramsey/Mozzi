@@ -11,7 +11,7 @@
 
     Circuit: Audio output on digital pin 9 on a Uno or similar, or
     DAC/A14 on Teensy 3.1, or
-    check the README or http://sensorium.github.com/Mozzi/
+    check the README or http://sensorium.github.io/Mozzi/
 
 		Mozzi documentation/API
 		https://sensorium.github.io/Mozzi/doc/html/index.html
@@ -109,9 +109,9 @@ void updateControl(){
 }
 
 
-int updateAudio(){
+AudioOutput_t updateAudio(){
   Q15n16 modulation = deviation * aModulator.next() >> 8;
-  return (int)aCarrier.phMod(modulation);
+  return MonoOutput::from8Bit(aCarrier.phMod(modulation));
 }
 
 

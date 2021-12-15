@@ -9,7 +9,7 @@
   Circuit:
     Audio input on pin analog 0
     Output on DAC/A14 on Teensy 3.0, 3.1, or digital pin 9 on a Uno or similar, or
-    check the README or http://sensorium.github.com/Mozzi/
+    check the README or http://sensorium.github.io/Mozzi/
 
      Potentiometer connected to analog pin A1.
      Center pin of the potentiometer goes to the analog pin.
@@ -44,12 +44,12 @@ void updateControl(){
 }
 
 
-int updateAudio(){
+AudioOutput_t updateAudio(){
   // subtracting 512 moves the unsigned audio data into 0-centred,
   // signed range required by all Mozzi units
   int asig = getAudioInput()-512;
   asig = lpf.next(asig>>1);
-  return asig;
+  return MonoOutput::fromAlmostNBit(9, asig);
 }
 
 

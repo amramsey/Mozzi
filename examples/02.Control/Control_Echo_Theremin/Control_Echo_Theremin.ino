@@ -10,7 +10,7 @@
 
 			 Audio output on digital pin 9 on a Uno or similar, or
 			DAC/A14 on Teensy 3.1, or
-			 check the README or http://sensorium.github.com/Mozzi/
+			 check the README or http://sensorium.github.io/Mozzi/
 
 		Light dependent resistor (LDR) and 5.1k resistor on analog pin 1:
 			 LDR from analog pin to +5V (3.3V on Teensy 3.1)
@@ -66,9 +66,12 @@ void updateControl(){
 }
 
 
-int updateAudio(){
-  return 3*((int)aSin0.next()+aSin1.next()+(aSin2.next()>>1)
-    +(aSin3.next()>>2)) >>3;
+AudioOutput_t updateAudio(){
+  return MonoOutput::almostNBit(12,
+    3*((int)aSin0.next()+aSin1.next()+(aSin2.next()>>1)
+    +(aSin3.next()>>2))
+  );
+);
 }
 
 

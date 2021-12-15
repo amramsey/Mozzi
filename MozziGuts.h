@@ -22,7 +22,7 @@
 
 #include "hardware_defines.h"
 
-#if IS_TEENSY3()
+#if IS_TEENSY3() || IS_TEENSY4()
 // required from http://github.com/pedvide/ADC for Teensy 3.*
 #include <ADC.h>
 #endif
@@ -89,11 +89,9 @@ x..A14.....Teensy 3.0, 3.1 and 3.2  \n
 On Teensy 3.* STANDARD and STANDARD_PLUS are the same, providing 16384Hz sample rate and 12 bit resolution on pin A14/ADC.
 The Teensy 3.* DAC output does not rely on PWM.
 
-On AVR, there is the possibility to use an external DAC in order to have an Audio output which does not rely on PWM. For now, this is only implemented for MCP49XX DAC, you can enable this in mozzi_config.h. Please see details in AudioConfigExternalDAC.h.
-*/
 
+@ingroup core
 
-/** @ingroup core
 Used to set AUDIO_MODE to HIFI.
 
 HIFI for AVR  and STM32 (not for Teensy 3.*)
@@ -156,6 +154,9 @@ HIFI is not available/not required on Teensy 3.* or ARM.
 #define STANDARD_PLUS 1
 #define HIFI 2
 
+//enum audio_channels {MONO,STEREO,...};
+#define MONO 1
+#define STEREO 2
 
 #include "mozzi_config.h" // User can change the config file to set audio mode
 
@@ -163,6 +164,13 @@ HIFI is not available/not required on Teensy 3.* or ARM.
 #error AUDIO_RATE 32768 does not work when AUDIO_MODE is STANDARD, try setting the AUDIO_MODE to STANDARD_PLUS in Mozzi/mozzi_config.h
 #endif
 
+#if (STEREO_HACK == true)
+#warning Use of STEREO_HACK is deprecated. Use AUDIO_CHANNELS STEREO, instead.
+#define AUDIO_CHANNELS STEREO
+#endif
+#if !defined(AUDIO_CHANNELS)
+#define AUDIO_CHANNELS MONO
+#endif
 
 #define CLOCK_TICKS_PER_AUDIO_TICK (F_CPU / AUDIO_RATE)
 
@@ -175,26 +183,44 @@ HIFI is not available/not required on Teensy 3.* or ARM.
 #define MICROS_PER_AUDIO_TICK 31 // = 1000000 / 32768 = 30.518, ...* 256 = 7812.6
 #endif
 
-#ifdef EXTERNAL_DAC
-#include"AudioConfigExternalDAC.h"
+// for compatibility with old (local) versions of mozzi_config.h
+#if !defined(EXTERNAL_AUDIO_OUTPUT)
+#define EXTERNAL_AUDIO_OUTPUT false
 #endif
+
+#if (EXTERNAL_AUDIO_OUTPUT != true)
 #if IS_TEENSY3()
 #include "AudioConfigTeensy3_12bit.h"
+#elif IS_TEENSY4()
+#include "AudioConfigTeensy4.h"
 #elif IS_STM32()
 #include "AudioConfigSTM32.h"
 #elif IS_ESP8266()
 #include "AudioConfigESP.h"
+#elif IS_ESP32()
+#include "AudioConfigESP32.h"
 #elif IS_SAMD21()
 #include "AudioConfigSAMD21.h"
-#elif IS_AVR()
-#if (AUDIO_MODE == STANDARD)
+#elif IS_AVR() && (AUDIO_MODE == STANDARD)
 #include "AudioConfigStandard9bitPwm.h"
-#elif (AUDIO_MODE == STANDARD_PLUS)
+#elif IS_AVR() && (AUDIO_MODE == STANDARD_PLUS)
 #include "AudioConfigStandardPlus.h"
-#elif (AUDIO_MODE == HIFI)
+#elif IS_AVR() && (AUDIO_MODE == HIFI)
 #include "AudioConfigHiSpeed14bitPwm.h"
 #endif
+#else // EXTERNAL_AUDIO_OUTPUT==true
+#if !defined(EXTERNAL_AUDIO_BITS)
+#define EXTERNAL_AUDIO_BITS 16
 #endif
+#define AUDIO_BITS EXTERNAL_AUDIO_BITS
+#define AUDIO_BIAS (1 << (AUDIO_BITS - 1))
+#endif
+
+#if (STEREO_HACK == true)
+extern int audio_out_1, audio_out_2;
+#endif
+
+#include "AudioOutput.h"
 
 // common numeric types
 typedef unsigned char uchar;
@@ -262,12 +288,18 @@ on which one(s) are required for other tasks. */
 void stopMozzi();
 
 
-// TB2017 deleted function, use startMozzi() instead
-// /** @ingroup core
-// Restores Mozzi audio and control interrupts, if they have been temporarily
-// disabled with pauseMozzi().
-// */
-// void unPauseMozzi();
+/** @ingroup core
+Obsolete function, use stopMozzi() instead.
+*/
+void pauseMozzi();
+
+//TB2017-19
+/** @ingroup core
+Obsolete function, use startMozzi() instead.
+Restores Mozzi audio and control interrupts, if they have been temporarily
+disabled with pauseMozzi().
+*/
+void unPauseMozzi();
 
 
 /** @ingroup core
@@ -277,12 +309,7 @@ calculations here which could be done in setup() or updateControl().
 @return an audio sample.  In STANDARD modes this is between -244 and 243 inclusive.
 In HIFI mode, it's a 14 bit number between -16384 and 16383 inclusive.
 */
-#if (STEREO_HACK == true)
-extern int audio_out_1, audio_out_2;
-void updateAudio();
-#else
-int updateAudio();
-#endif
+AudioOutput_t updateAudio();
 
 /** @ingroup core
 This is where you put your control code. You need updateControl() somewhere in

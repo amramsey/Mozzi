@@ -12,7 +12,7 @@
   The circuit:
     Audio output on digital pin 9 on a Uno or similar, or
     DAC/A14 on Teensy 3.1, or
-    check the README or http://sensorium.github.com/Mozzi/
+    check the README or http://sensorium.github.io/Mozzi/
 
   Piezo on analog pin A3:
     + connection of the piezo attached to the analog pin
@@ -70,8 +70,8 @@ void updateControl(){
 }
 
 
-int updateAudio(){
-  return aSample.atIndex(Q16n16_to_Q16n0(scrub.next()));
+AudioOutput_t updateAudio(){
+  return MonoOutput::from8Bit(aSample.atIndex(Q16n16_to_Q16n0(scrub.next())));
 }
 
 

@@ -13,7 +13,7 @@
   The circuit:
      Audio output on digital pin 9 on a Uno or similar, or
     DAC/A14 on Teensy 3.1, or
-     check the README or http://sensorium.github.com/Mozzi/
+     check the README or http://sensorium.github.io/Mozzi/
 
      Potentiometer connected to analog pin 0.
        Center pin of the potentiometer goes to the analog pin.
@@ -129,9 +129,9 @@ void updateControl(){
 }
 
 
-int updateAudio(){
+AudioOutput_t updateAudio(){
   long modulation = aSmoothIntensity.next(fm_intensity) * aModulator.next();
-  return aCarrier.phMod(modulation);
+  return MonoOutput::from8Bit(aCarrier.phMod(modulation));
 }
 
 

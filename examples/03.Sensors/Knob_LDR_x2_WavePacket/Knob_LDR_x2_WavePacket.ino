@@ -14,7 +14,7 @@
   The circuit:
      Audio output on digital pin 9 on a Uno or similar, or
     DAC/A14 on Teensy 3.1, or
-     check the README or http://sensorium.github.com/Mozzi/
+     check the README or http://sensorium.github.io/Mozzi/
 
      Potentiometer connected to analog pin 0.
        Center pin of the potentiometer goes to the analog pin.
@@ -40,6 +40,7 @@
 #include <WavePacket.h>
 #include <RollingAverage.h>
 #include <AutoMap.h>
+#include <IntMap.h>
 
 const int KNOB_PIN = 0; // set the input for the knob to analog pin 0
 const int LDR1_PIN=1; // set the analog input for fm_intensity to pin 1
@@ -61,8 +62,10 @@ const int MAX_CF = 600;
 RollingAverage <int, 16> kAverageF;
 RollingAverage <int, 16> kAverageBw;
 RollingAverage <int, 16> kAverageCf;
-// AutoMap adapts to range of input as it arrives
-AutoMap kMapF(0,1023,MIN_F,MAX_F);
+
+// Intmap is a pre-calculated faster version of Arduino's map, OK for pots
+IntMap kMapF(0,1023,MIN_F,MAX_F);
+// AutoMap adapts to range of input as it arrives, useful for LDR's
 AutoMap kMapBw(0,1023,MIN_BW,MAX_BW);
 AutoMap kMapCf(0,1023,MIN_CF,MAX_CF);
 
@@ -100,8 +103,8 @@ void updateControl(){
 
 
 
-int updateAudio(){
-  return wavey.next()>>8; // >>8 for AUDIO_MODE STANDARD
+AudioOutput_t updateAudio(){
+  return MonoOutput::from16Bit(wavey.next());
 }
 
 

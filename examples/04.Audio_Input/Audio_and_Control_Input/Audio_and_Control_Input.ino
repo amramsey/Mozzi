@@ -15,7 +15,7 @@
   Circuit:
   Audio cable centre wire on pin A0, outer shielding to Arduino Ground.
   Audio output on DAC/A14 on Teensy 3.0, 3.1, or digital pin 9 on a Uno or similar, or
-  check the README or http://sensorium.github.com/Mozzi/
+  check the README or http://sensorium.github.io/Mozzi/
   Analog sensor inputs on any other analog input pins.
   The serial printing might cause glitches, so try commenting
   them out to test if this is a problem.
@@ -50,11 +50,10 @@ void updateControl(){
 }
 
 
-int updateAudio(){
+AudioOutput_t updateAudio(){
   int asig = getAudioInput(); // range 0-1023
   asig = asig - 512; // now range is -512 to 511
-  asig >>= 2; // now it's -128 to 127, within audio output range
-  return asig;
+  return MonoOutput::fromAlmostNBit(9, asig).clip();
 }
 
 

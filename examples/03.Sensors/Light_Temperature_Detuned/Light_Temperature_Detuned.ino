@@ -11,7 +11,7 @@
   Circuit:
     Audio output on digital pin 9 on a Uno or similar, or
     DAC/A14 on Teensy 3.1, or
-    check the README or http://sensorium.github.com/Mozzi/
+    check the README or http://sensorium.github.io/Mozzi/
 
     Temperature dependent resistor (Thermistor) and 5.1k resistor on analog pin 1:
       Thermistor from analog pin to +5V (3.3V on Teensy 3.1)
@@ -152,7 +152,7 @@ void updateControl(){
 }
 
 
-int updateAudio(){
+AudioOutput_t updateAudio(){
 
   int asig =
     aCos1.next() + aCos1b.next() +
@@ -162,5 +162,5 @@ int updateAudio(){
     aCos5.next() + aCos5b.next() +
     aCos6.next() + aCos6b.next();
 
-  return asig >> 3;
+  return MonoOutput::fromAlmostNBit(12, asig);
 }

@@ -13,7 +13,7 @@
     or the AUDIO_RATE could be increased to 32768 Hz, if the
     cpu isn't too busy.
 
-    HIFI mode is not for Teensy 3.1, but the PWM led part should work.
+    HIFI mode is not for Teensy 3.x, but the PWM led part should work.
 
     IMPORTANT: this sketch requires Mozzi/mozzi_config.h to be
     be changed from STANDARD mode to HIFI.
@@ -111,11 +111,11 @@ void updateControl(){
 }
 
 
-int updateAudio(){
+AudioOutput_t updateAudio(){
   updateRGB(red_brightness, green_brightness, blue_brightness);
   // this would make more sense with a higher resolution signal
   // but still benefits from using HIFI to avoid the 16kHz pwm noise
-  return aSin.next()<<6; // 8 bits scaled up to 14 bits
+  return MonoOutput::from8Bit(aSin.next());
 }
 
 

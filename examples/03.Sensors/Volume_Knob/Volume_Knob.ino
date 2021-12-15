@@ -10,7 +10,7 @@
   The circuit:
     Audio output on digital pin 9 on a Uno or similar, or
     DAC/A14 on Teensy 3.1, or
-    check the README or http://sensorium.github.com/Mozzi/
+    check the README or http://sensorium.github.io/Mozzi/
 
   Potentiometer connected to analog pin 0:
      Center pin of the potentiometer goes to the analog pin.
@@ -65,8 +65,8 @@ void updateControl(){
 }
 
 
-int updateAudio(){
-  return ((int)aSin.next() * volume)>>8; // shift back into range after multiplying by 8 bit value
+AudioOutput_t updateAudio(){
+  return MonoOutput::from16Bit((int)aSin.next() * volume); // 8 bit * 8 bit gives 16 bits value
 }
 
 
