@@ -32,14 +32,11 @@ passing or external synths.
 ***
 
 ## Installation  
-Download the most recent version of Mozzi from Github.
-Then, following the instructions from the [Arduino libraries guide](http://arduino.cc/en/Guide/Libraries).
+Use the "code" button on Mozzi's Github page to download a ZIP file of the latest developing code.  Import this into Arduino, following the instructions from the [Arduino libraries guide](http://arduino.cc/en/Guide/Libraries).
 
-In the Arduino IDE, navigate to __Sketch > Import Library__.  At the top of the drop
-down list, select the option to __Add Library__.  Navigate to the folder's location and open it.
-Return to the __Sketch > Import Library__ menu.
-You should now see the library at the bottom of the drop-down menu.
-It is ready to be used in your sketch.
+*In the Arduino IDE, navigate to Sketch > Include Library > Add .ZIP Library. At the top of the drop down list, select the option to "Add .ZIP Library".*
+
+(Note: the files in the "releases" section on Github are now legacy.  The development code is recommended.)
 
 ***
 
@@ -75,6 +72,7 @@ Adafruit Playground Express | Built in Speaker | yes
 Sanguino | 13	| -  
 STM32duino (see "Hardware specific notes", below) | PB8 | yes
 ESP8266 *see details* | GPIO2 | yes
+RP2040 | 0 | yes
 
 For details about HIFI mode, read the [Mozzi core module documentation](http://sensorium.github.io/Mozzi/doc/html/group__core.html#gae99eb43cb29bb03d862ae829999916c4/).  
 
@@ -142,11 +140,12 @@ If you need your synth to run faster on AVR architectures, Arduino versions abov
 
 Find Arduino’s platform.txt (on OSX you can find it by searching in Users/your_name/Library/Arduino15). Search and replace -Os with -O2. Save.
 
-It’s explained more thoroughly (for Windows) [here] (http://www.instructables.com/id/Arduino-IDE-16x-compiler-optimisations-faster-code/?ALLSTEPS).
+It’s explained more thoroughly (for Windows) [here](http://www.instructables.com/id/Arduino-IDE-16x-compiler-optimisations-faster-code/?ALLSTEPS).
 
 If you still need more speed, Arduino 1.0.5 produces slightly faster code.
 
 ***
+
 ## Using external chips to produce the sound
 
 External chips (DAC) can also be used on any platform which does not support natively the I2S protocol  using an user defined `audioOutput` function. This can allow a greater audio quality over the native ways to output the sound (PWM for AVR Arduinos and STM32 and 12 bit DAC for Teensy 3.*).
@@ -172,13 +171,13 @@ Modified versions of the following libraries are included in the Mozzi download:
 
 Mozzi has also drawn on and been influenced by (among many others):  
 
-[xorshift] (http://www.jstatsoft.org/v08/i14/xorshift.pdf) random number generator, George Marsaglia, (2003)  
+[xorshift](http://www.jstatsoft.org/v08/i14/xorshift.pdf) random number generator, George Marsaglia, (2003)  
 ead~.c puredata external (creb library) Copyright (c) 2000-2003 by Tom Schouten (GPL2)  
 [AF_precision_synthesis](http://adrianfreed.com/content/arduino-sketch-high-frequency-precision-sine-wave-tone-sound-synthesis)
 by Adrian Freed, 2009  
 [Resonant filter](http://www.musicdsp.org/archive.php?classid=3#259) posted to musicdsp.org by Paul Kellett,
-and fixed point version of the filter on [dave's blog of art and programming] (http://www.pawfal.org/dave/blog/2011/09/)  
-State Variable filter pseudocode at [musicdsp.org] (http://www.musicdsp.org/showone.php?id=23 and http://www.musicdsp.org/showone.php?id=142)  
+and fixed point version of the filter on [dave's blog of art and programming](http://www.pawfal.org/dave/blog/2011/09/)  
+State Variable filter pseudocode at [musicdsp.org](http://www.musicdsp.org/showone.php?id=23) and [here](http://www.musicdsp.org/showone.php?id=142)  
 Various examples from [Pure Data](http://puredata.info/) by Miller Puckette  
 [Practical synthesis tutorials](http://www.obiwannabe.co.uk/) by Andy Farnell  
 
@@ -189,9 +188,9 @@ Various examples from [Pure Data](http://puredata.info/) by Miller Puckette
 port by Thomas Friedrichsmeier
 
 Compiles for and runs on a STM32F103C8T6 blue pill board, with a bunch of caveats (see below), i.e. on a board _without_ a
-real DAC. Should probably run on any other board supported by [STM32duino](https://github.com/rogerclarkmelbourne/Arduino_STM32).
+real DAC. Should probably run on any other board supported by [STM32duino](https://github.com/rogerclarkmelbourne/Arduino_STM32) (STM32F4 is __not__ supported for now).
 
-- You will need a very recent (12/2017) checkout of the Arduino_STM32 repository, otherwise compilation will fail.
+- You will need a very recent checkout of the Arduino_STM32 repository, otherwise compilation will fail.
 - Audio output is to pin PB8, by default (HIFI-mode: PB8 and PB9)
 - If you want to use MIDI, be sure to replace "MIDI_CREATE_DEFAULT_INSTANCE()" with "MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI)" (or Serial2)
 - Timers 4 (PWM output), and 2 (audio rate) are used by default.
@@ -242,9 +241,10 @@ port by Thomas Friedrichsmeier
   - PDM_VIA_SERIAL: Output is coded using pulse density modulation, and sent via GPIO2 (Serial1 TX).
     - This output mode uses timer1 for queuing audio sample, so that timer is not available for other uses.
     - Note that this mode has slightly lower effective analog output range than PDM_VIA_I2S, due to start/stop bits being added to the output stream.
-  - PDM_VIA_I2S: Output is coded using pulse density modulation, and sent via the I2S pins. The I2S data out pin (which is also "RX") will have the output, but *all* I2S output pins (RX, GPIO2 and GPIO15) will be
-  affected. Mozzi tries to set GPIO2 and GPIO15 to input mode, and *at the time of this writing*, this allows I2S output on RX even on boards such as the ESP01 (where GPIO15 is tied to Gnd). However, it seems safest to
-  assume that this mode may not be useable on boards where GPIO2 or GPIO15 are not available as output pins.
+  - PDM_VIA_I2S: Output is coded using pulse density modulation, and sent via the I2S pins. The I2S data out pin (GPIO3, which is also "RX") will have the output,
+  but *all* I2S output pins (RX, GPIO2 and GPIO15) will be affected. Mozzi tries to set GPIO2 and GPIO15 to input mode, and *at the time of this writing*, this allows
+  I2S output on RX even on boards such as the ESP01 (where GPIO15 is tied to Gnd). However, it seems safest to assume that this mode may not be useable on boards where
+  GPIO2 or GPIO15 are not available as output pins.
   - EXTERNAL_DAC_VIA_I2S: Output is sent to an external DAC (such as a PT8211), digitally coded. This is the only mode that supports STEREO. It also needs the least processing power.
 - There is no "HIFI_MODE" in addition to the above output options. For high quality output, either use an external DAC, or increase the PDM_RESOLUTION value.
 - Note that the ESP8266 pins can output less current than the other supported CPUs. The maximum is 12mA, with a recommendation to stay below 6mA.
@@ -272,7 +272,7 @@ port by Dieter Vandoren and Thomas Friedrichsmeier
     - 16 bits resolution, mono or stereo. Remember to shift your audio accordingly.
     - Output pins can be configured in AudioConfigESP32.h. Default is BCK: 26, WS: 15, DATA: 33
   - PDM_VIA_I2S: Output is converted using pulse density modulation, sent to the I2S data pin. No external hardware needed.
-    - 16 bits resolution, mono or stereo. Remember to shift your audio accordingly.
+    - 16 bits resolution. Remember to shift your audio accordingly.
     - Output (DATA) pin can be configured in AudioConfigESP32.h. Default 33. Note that the BCK and WS pins are also used in this mode.
     - The PDM_RESOLUTION parameter can be used to reduce noise at the cost of more CPU power.
     - Mono, only.
@@ -280,12 +280,35 @@ port by Dieter Vandoren and Thomas Friedrichsmeier
 - WIFI-activity not yet tested, but likely the same notes as for ESP8266 apply. Consider turning off WIFI.
 - The implementation of audioTicks() may be slightly inaccurate on this platform.
 
+### RP2040 (Raspberry Pi Pico)
+port by Thomas Friedrichsmeier
+
+Compiles and runs using [this core](https://github.com/earlephilhower/arduino-pico). Can probably be ported to the Mbed core for RP2040, relatively easily, as it relies mostly
+on the RP2040 SDK API. Tested on a Pi Pico.
+
+- This is a recent addition, implementation details may still change (currently just PWM driven by a timer; this may be worth changing to a DMA driven output)
+- Wavetables and samples are not kept in progmem on this platform. While apparently speed (of the external flash) is not much of an issue, the data always seems to be copied into RAM, anyway.
+- Currently, two audio output modes exist (configurable in AudioConfigRP2040.h) in addition to using an user-defined `audioOutput` function, with the default being PWM_VIA_BARE_CHIP:
+  - PWM_VIA_BARE_CHIP: PWM audio output on pin 0, by default, with 11 bits default output resolution
+    - One hardware timer interrupt and one DMA channel are claimed (number not hardcoded), a non-exclusive handler is installed on DMA_IRQ_0.
+    - HIFI_MODE not yet implemented (although that should not be too hard to do).
+  - EXTERNAL_DAC_VIA_I2S: I2S output to be connected to an external DAC
+    - 16 bits resolution by default (configurable in AudioConfigRP2040.h), 8, 16, 24 (left aligned) and 32 resolution are available.
+    - Both plain I2S and LSBJ_FORMAT (for the PT8211 for instance) are available (configurable in AudioConfigRP2040.h), default is LSBJ.
+    - Outputs pins can be configured in AudioConfigRP2040.h. Default is BCK: 20, WS: 21, DATA: 22.
+    - Two DMA channels are claimed (numbers not hardcoded), non-exclusive handlers are installed on DMA_IRQ_0.
+    - At the time of writing, LSBJ is only available with github arduino-pico core.
+- Note that AUDIO_INPUT and mozziAnalogRead() return values in the RP2040's full ADC resolution of 0-4095 rather than AVR's 0-1023.
+- twi_nonblock is not ported
+- Code uses only one CPU core
+
+
 ***
 
 ## Use and Remix
 Mozzi is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License, which is detailed in LICENSE.txt
 
-Disclaimer: This is a human-readable summary of (and not a substitute for) the license. 
+Disclaimer: This is a human-readable summary of (and not a substitute for) the license.
 
 You are free to:
  - Share — copy and redistribute the material in any medium or format
